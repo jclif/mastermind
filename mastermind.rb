@@ -48,21 +48,29 @@ class Mastermind
   end
 
   def input
+    begin
+      move = get_input
+      @guesses << move
+      @match_info << match(@guesses.length-1)
+    rescue StandardError => e
+      puts e.message
+      retry
+    end
+  end
+
+  def get_input
     puts "Next Move? (i.e. 'R G Y O')"
     move = gets.chomp.split
     is_valid = move.all? { |peg| @@colors.include?(peg) }
-    until move.length == 4 && is_valid
-      puts "Invalid move, try again."
-      move = gets.chomp.split
-      is_valid = move.all? { |peg| @@colors.include?(peg) }
+
+    unless is_valid and move.length == 4
+      raise StandardError.new "Bad Input"
     end
-    @guesses << move
-    @match_info << match(@guesses.length-1)
+
+    move
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  h = Hangman.new(1)
-  h.play
-  p "adef"
+  m = Mastermind.new.play
 end
